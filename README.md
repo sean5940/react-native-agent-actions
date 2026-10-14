@@ -176,7 +176,7 @@ Measured on an emulator and a simulator with release builds, a call to an app th
 
 ## Testing
 
-**iOS:** actions with `phrases` show up in the Shortcuts app under your app's name. Run them from there, or ask Siri with the phrase. Every action also appears as an action you can add to a shortcut.
+**iOS:** actions with `phrases` show up in the Shortcuts app under your app's name, and every action also appears as an action you can add to a shortcut. Running them from the Shortcuts app works on the Simulator. Test Siri phrases on a real device: Siri on the Simulator cannot match App Shortcut phrases to your app, so it answers that the app is not on the device.
 
 **Android:** on an Android 16 or later device or emulator, list the indexed functions and call one with `adb`. Function ids have the form `dev.agentactions.generated.AgentActionsServiceBase#<action>`.
 

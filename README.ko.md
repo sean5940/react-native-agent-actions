@@ -121,7 +121,7 @@ export const handlers: AgentActionHandlers = {
 
 ## 테스트
 
-**iOS**: `phrases`가 있는 액션은 단축어 앱의 앱 이름 아래에 나타납니다. 거기서 실행하거나 Siri에게 문구로 요청하세요. 모든 액션은 단축어에 추가할 수 있는 동작으로도 나타납니다.
+**iOS**: `phrases`가 있는 액션은 단축어 앱의 앱 이름 아래에 나타납니다. 모든 액션은 단축어에 추가할 수 있는 동작으로도 나타납니다. 단축어 앱에서 실행하는 것은 시뮬레이터에서도 됩니다. Siri 문구 호출은 실기기에서 시험하세요. 시뮬레이터의 Siri는 App Shortcut 문구를 앱에 연결하지 못해서 앱이 기기에 없다고 답합니다.
 
 **Android**: Android 16 이상 기기나 에뮬레이터에서 `adb`로 색인된 함수를 보고 호출할 수 있습니다. 함수 ID는 `dev.agentactions.generated.AgentActionsServiceBase#<action>` 형식입니다.
 
