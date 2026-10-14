@@ -1,0 +1,16 @@
+// Applied from the app module's build.gradle by `react-native-agent-actions generate`.
+// It adds the AppFunctions library and the KSP processor that turns the generated
+// AgentActionsServiceBase into the service and the XML that Android indexes.
+//
+// Override the AppFunctions version with `ext.agentActionsAppFunctionsVersion` in android/build.gradle.
+
+def agentActionsAppFunctionsVersion = rootProject.ext.has("agentActionsAppFunctionsVersion")
+  ? rootProject.ext.get("agentActionsAppFunctionsVersion")
+  : "1.0.0-alpha13"
+
+apply plugin: "com.google.devtools.ksp"
+
+dependencies {
+  implementation "androidx.appfunctions:appfunctions:${agentActionsAppFunctionsVersion}"
+  ksp "androidx.appfunctions:appfunctions-compiler:${agentActionsAppFunctionsVersion}"
+}
