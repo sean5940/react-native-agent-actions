@@ -1,2 +1,2 @@
 export { registerAgentActions } from './registerAgentActions';
-export type { AgentActionHandler, AgentActionHandlers } from './types';
+export type { AgentActionHandler } from './types';

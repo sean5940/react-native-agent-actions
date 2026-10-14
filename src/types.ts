@@ -1,3 +1,1 @@
-export type AgentActionHandler = (payload: unknown) => unknown;
-
-export type AgentActionHandlers = Record<string, AgentActionHandler>;
+export type AgentActionHandler = (params: unknown) => unknown;

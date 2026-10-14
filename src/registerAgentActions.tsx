@@ -1,3 +1,3 @@
-import type { AgentActionHandlers } from './types';
-
-export function registerAgentActions(_handlers: AgentActionHandlers): void {}
+export function registerAgentActions<Handlers extends object>(
+  _handlers: Handlers
+): void {}
