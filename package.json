@@ -12,8 +12,12 @@
     },
     "./package.json": "./package.json"
   },
+  "bin": {
+    "react-native-agent-actions": "./cli/index.mjs"
+  },
   "files": [
     "src",
+    "cli",
     "lib",
     "android",
     "ios",
@@ -39,12 +43,23 @@
     "prepare": "bob build",
     "nitrogen": "nitrogen",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\""
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "test:cli": "node --test \"cli/__tests__/*.test.mjs\"",
+    "generate": "node cli/index.mjs generate --root example",
+    "typecheck:cli": "tsc -p cli/tsconfig.json"
   },
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "appfunctions",
+    "app-intents",
+    "siri",
+    "shortcuts",
+    "gemini",
+    "ai",
+    "agents",
+    "nitro"
   ],
   "repository": {
     "type": "git",

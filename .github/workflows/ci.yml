@@ -29,8 +29,13 @@ jobs:
         run: yarn lint
 
       - name: Typecheck files
-        run: yarn typecheck
+        run: yarn typecheck && yarn typecheck:cli
 
+      - name: Test the code generator
+        run: yarn test:cli
+
+      - name: Check the example's generated files
+        run: node cli/index.mjs generate --root example --check
 
   build-library:
     runs-on: ubuntu-latest
