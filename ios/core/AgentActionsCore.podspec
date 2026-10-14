@@ -1,10 +1,11 @@
 require "json"
 
-package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+package = JSON.parse(File.read(File.join(__dir__, "..", "..", "package.json")))
 
-# Pure Swift module that app code (generated App Intents) imports.
+# Pure Swift module that app code (the generated App Intents) imports.
 # It must not depend on the Nitro module: that module is compiled with C++ interop,
 # and Swift code without C++ interop cannot import it.
+# It lives outside the package root because React Native autolinking links the first podspec it finds there.
 Pod::Spec.new do |s|
   s.name         = "AgentActionsCore"
   s.version      = package["version"]
@@ -17,5 +18,5 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/sean5940/react-native-agent-actions.git", :tag => "#{s.version}" }
   s.swift_version = "5.9"
 
-  s.source_files = "ios/core/**/*.swift"
+  s.source_files = "*.swift"
 end
