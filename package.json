@@ -12,9 +12,7 @@
     },
     "./package.json": "./package.json"
   },
-  "bin": {
-    "react-native-agent-actions": "./cli/index.mjs"
-  },
+  "bin": "./cli/index.mjs",
   "files": [
     "src",
     "cli",

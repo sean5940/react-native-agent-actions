@@ -7114,6 +7114,8 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-nitro-modules: ^0.37.1
+  bin:
+    react-native-agent-actions: ./cli/index.mjs
   languageName: unknown
   linkType: soft
 
