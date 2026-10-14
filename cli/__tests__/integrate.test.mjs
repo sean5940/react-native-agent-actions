@@ -1,7 +1,16 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { updateAppBuildGradle, updateManifest, updateRootBuildGradle } from '../integrate/android.mjs';
-import { updatePodfile } from '../integrate/ios.mjs';
+import { alternativeAppNames, updatePodfile } from '../integrate/ios.mjs';
+
+describe('alternativeAppNames', () => {
+  it('writes the pronunciation hint only when there is one', () => {
+    assert.deepEqual(alternativeAppNames([{ name: '노트 앱', pronunciationHint: undefined }, { name: 'Notey', pronunciationHint: 'no tee' }]), [
+      { INAlternativeAppName: '노트 앱' },
+      { INAlternativeAppName: 'Notey', INAlternativeAppNamePronunciationHint: 'no tee' },
+    ]);
+  });
+});
 
 const manifest = `<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application android:name=".MainApplication">

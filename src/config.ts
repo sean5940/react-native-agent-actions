@@ -54,14 +54,29 @@ export interface AgentAction {
   platforms?: Array<'android' | 'ios'>;
   ios?: {
     /**
-     * App Shortcut phrases for Siri and Spotlight. Each phrase must contain `${applicationName}`,
-     * for example `'Search notes in ${applicationName}'`.
+     * App Shortcut phrases for Siri and Spotlight, in the app's development language.
+     * Each phrase must contain `${applicationName}`, for example `'Search notes in ${applicationName}'`.
      */
     phrases?: string[];
+    /**
+     * The same phrases in other languages, keyed by locale (`ko`, `ja`, `zh-Hans`, ...).
+     * Each list has one entry per phrase in `phrases`, in the same order.
+     * Siri only matches phrases in its own language, so add the languages your users speak.
+     */
+    localizedPhrases?: Record<string, string[]>;
     /** SF Symbol shown next to the App Shortcut. */
     systemImageName?: string;
   };
 }
+
+/** Another name people may use for the app when they talk to Siri. */
+export type AgentActionsAppName =
+  | string
+  | {
+      name: string;
+      /** How the name is pronounced, when it differs from how it is written. */
+      pronunciationHint?: string;
+    };
 
 export interface AgentActionsConfig {
   actions: Record<string, AgentAction>;
@@ -80,6 +95,13 @@ export interface AgentActionsConfig {
     target?: string;
     /** Defaults to `ios/Podfile`. */
     podfile?: string;
+    /** Defaults to `Info.plist` in `sourceDir`. */
+    infoPlist?: string;
+    /**
+     * Names Siri should also accept for the app (`INAlternativeAppNames`). Siri finds the app by
+     * its name, so add a name that is easy to say in each language, for example `'노트 앱'`.
+     */
+    appNames?: AgentActionsAppName[];
   };
   typescript?: {
     /** Defaults to `src/agentActions.generated.ts`. */

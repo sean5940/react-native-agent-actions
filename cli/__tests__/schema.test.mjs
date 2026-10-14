@@ -52,6 +52,7 @@ describe('readSchema', () => {
     );
     const schema = readSchema({ actions: { first: { title: 'F', description: 'F.', result: a }, second: { title: 'S', description: 'S.', result: a } } });
     assert.equal(schema.objects.size, 1);
+    assert.throws(() => readSchema(configWith({ result: { ...a, name: 'AgentActionResult' } })), /used by the generated code/);
   });
 
   it('requires ${applicationName} in phrases and caps App Shortcuts at ten', () => {
@@ -60,6 +61,24 @@ describe('readSchema', () => {
       Array.from({ length: 11 }, (_, i) => [`action${i}`, { title: 'A', description: 'A.', ios: { phrases: ['Run ${applicationName}'] } }])
     );
     assert.throws(() => readSchema({ actions }), /at most 10/);
+  });
+
+  it('checks localized phrases against the base phrases', () => {
+    const ios = (localizedPhrases) => configWith({ ios: { phrases: ['Do it in ${applicationName}'], localizedPhrases } });
+    assert.deepEqual(readSchema(ios({ ko: ['${applicationName}에서 해 줘'] })).actions[0].localizedPhrases, { ko: ['${applicationName}에서 해 줘'] });
+    assert.throws(() => readSchema(ios({ ko: [] })), /one phrase for each/);
+    assert.throws(() => readSchema(ios({ ko: ['해 줘'] })), /applicationName/);
+    assert.throws(() => readSchema(ios({ Korean: ['${applicationName}에서 해 줘'] })), /not a locale/);
+  });
+
+  it('reads Siri app names as strings or objects', () => {
+    const schema = readSchema({ ...configWith({}), ios: { appNames: ['노트 앱', { name: 'Notey', pronunciationHint: 'no tee' }] } });
+    assert.deepEqual(schema.appNames, [
+      { name: '노트 앱', pronunciationHint: undefined },
+      { name: 'Notey', pronunciationHint: 'no tee' },
+    ]);
+    assert.deepEqual(readSchema(configWith({})).appNames, []);
+    assert.throws(() => readSchema({ ...configWith({}), ios: { appNames: [''] } }), /appNames/);
   });
 
   it('validates timeouts and platforms', () => {

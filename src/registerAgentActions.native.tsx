@@ -1,6 +1,7 @@
 import { AppRegistry, Platform } from 'react-native';
 import { NitroModules } from 'react-native-nitro-modules';
 import type { AgentActions } from './AgentActions.nitro';
+import { toEnvelope } from './reply';
 import type { AgentActionHandler } from './types';
 
 const native = NitroModules.createHybridObject<AgentActions>('AgentActions');
@@ -51,7 +52,7 @@ export function registerAgentActions<Handlers extends object>(
     }
     try {
       const result = await handler(JSON.parse(payloadJson));
-      native.resolveRequest(requestId, JSON.stringify(result ?? null));
+      native.resolveRequest(requestId, toEnvelope(result));
     } catch (error) {
       native.rejectRequest(requestId, toMessage(error));
     }

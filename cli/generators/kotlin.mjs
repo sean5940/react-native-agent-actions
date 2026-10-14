@@ -233,7 +233,6 @@ export function generateKotlin(schema) {
     'kotlin.coroutines.cancellation.CancellationException',
     ...(usesArrays ? ['org.json.JSONArray'] : []),
     'org.json.JSONObject',
-    'org.json.JSONTokener',
   ];
 
   const sections = [
@@ -262,7 +261,8 @@ export function generateKotlin(schema) {
     '      } catch (error: Exception) {',
     '        throw AppFunctionAppUnknownException(error.message)',
     '      }',
-    '    return JSONTokener(text).nextValue()',
+    '    // registerAgentActions sends { value, dialog }. The dialog is for Siri, so Android only reads the value.',
+    '    return JSONObject(text).opt("value")',
     '  }',
     '}',
     '',

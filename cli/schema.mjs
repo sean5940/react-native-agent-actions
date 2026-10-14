@@ -31,17 +31,24 @@
  * @property {boolean} android
  * @property {boolean} ios
  * @property {string[]} phrases
+ * @property {Record<string, string[]>} localizedPhrases
  * @property {string | undefined} systemImageName
+ *
+ * @typedef {object} AppName
+ * @property {string} name
+ * @property {string | undefined} pronunciationHint
  *
  * @typedef {object} Schema
  * @property {Action[]} actions
  * @property {Map<string, Extract<Value, { kind: 'object' }>>} objects
+ * @property {AppName[]} appNames
  */
 
 export const DEFAULT_TIMEOUT_MS = 10_000;
 export const IOS_MAX_TIMEOUT_MS = 25_000;
 const MAX_TIMEOUT_MS = 600_000;
 const MAX_APP_SHORTCUTS = 10;
+const LOCALE_RE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/;
 const PRIMITIVES = ['string', 'number', 'integer', 'boolean'];
 
 // Identifiers end up in Kotlin, Swift and TypeScript, so any keyword of the three is rejected.
@@ -150,6 +157,7 @@ function readValue(raw, where, objects, allowOptional) {
   }
   if (raw.type === 'object') {
     check(typeof raw.name === 'string' && /^[A-Z][A-Za-z0-9]*$/.test(raw.name), `${where}.name must be PascalCase letters and digits, for example "Note".`);
+    check(!raw.name.startsWith('AgentAction'), `${where}.name: names starting with "AgentAction" are used by the generated code.`);
     check(isRecord(raw.properties) && Object.keys(raw.properties).length > 0, `${where}.properties must list at least one property.`);
     const rawProperties = /** @type {Record<string, unknown>} */ (raw.properties);
     const properties = Object.entries(rawProperties).map(([propertyName, propertyRaw]) => {
@@ -217,6 +225,21 @@ function readAction(name, raw, objects) {
   for (const phrase of phrases) {
     check(phrase.includes('${applicationName}'), `${where}.ios.phrases: "${phrase}" must contain \${applicationName}. Write the phrase in a normal string, not a template literal.`);
   }
+
+  check(ios.localizedPhrases === undefined || isRecord(ios.localizedPhrases), `${where}.ios.localizedPhrases must be an object keyed by locale.`);
+  const rawLocalized = /** @type {Record<string, unknown>} */ (ios.localizedPhrases ?? {});
+  /** @type {Record<string, string[]>} */
+  const localizedPhrases = {};
+  for (const [locale, list] of Object.entries(rawLocalized)) {
+    const at = `${where}.ios.localizedPhrases.${locale}`;
+    check(LOCALE_RE.test(locale), `${at}: "${locale}" is not a locale such as "ko", "ja" or "zh-Hans".`);
+    check(Array.isArray(list) && list.every((p) => typeof p === 'string'), `${at} must be an array of strings.`);
+    check(list.length === phrases.length, `${at} must have one phrase for each of the ${phrases.length} phrases in ios.phrases, in the same order.`);
+    for (const phrase of list) {
+      check(phrase.includes('${applicationName}'), `${at}: "${phrase}" must contain \${applicationName}.`);
+    }
+    localizedPhrases[locale] = list;
+  }
   const systemImageName = readText(ios.systemImageName, `${where}.ios.systemImageName`, false);
 
   return {
@@ -229,8 +252,31 @@ function readAction(name, raw, objects) {
     android: platforms.includes('android'),
     ios: platforms.includes('ios'),
     phrases,
+    localizedPhrases,
     systemImageName,
   };
+}
+
+/**
+ * @param {unknown} raw
+ * @returns {AppName[]}
+ */
+function readAppNames(raw) {
+  if (raw === undefined) {
+    return [];
+  }
+  check(Array.isArray(raw), 'ios.appNames must be an array.');
+  return raw.map((entry, index) => {
+    const where = `ios.appNames[${index}]`;
+    if (typeof entry === 'string') {
+      return { name: readText(entry, where, true) ?? '', pronunciationHint: undefined };
+    }
+    check(isRecord(entry), `${where} must be a string or an object with a name.`);
+    return {
+      name: readText(entry.name, `${where}.name`, true) ?? '',
+      pronunciationHint: readText(entry.pronunciationHint, `${where}.pronunciationHint`, false),
+    };
+  });
 }
 
 /**
@@ -248,7 +294,23 @@ export function readSchema(config) {
 
   const shortcuts = actions.filter((action) => action.ios && action.phrases.length > 0).length;
   check(shortcuts <= MAX_APP_SHORTCUTS, `iOS allows at most ${MAX_APP_SHORTCUTS} App Shortcuts, but ${shortcuts} actions declare phrases.`);
-  return { actions, objects };
+  check(config.ios === undefined || isRecord(config.ios), 'ios must be an object.');
+  const ios = /** @type {Record<string, unknown>} */ (config.ios ?? {});
+  return { actions, objects, appNames: readAppNames(ios.appNames) };
+}
+
+/**
+ * Locales used across all actions' localized phrases, sorted.
+ * @param {Schema} schema
+ */
+export function phraseLocales(schema) {
+  const locales = new Set();
+  for (const action of schema.actions) {
+    if (action.ios && action.phrases.length > 0) {
+      Object.keys(action.localizedPhrases).forEach((locale) => locales.add(locale));
+    }
+  }
+  return /** @type {string[]} */ ([...locales].sort());
 }
 
 /** @param {string} name */

@@ -51,12 +51,15 @@ public final class AgentActionsDispatcher: @unchecked Sendable {
   private var waiting: [String: CheckedContinuation<String, Error>] = [:]
   private var queued: [Request] = []
 
-  /// Sends `payload` to the JavaScript handler of `action` and returns the decoded JSON result.
-  public func invoke(action: String, payload: [String: Any], timeoutMs: Int) async throws -> Any {
+  /// Sends `payload` to the JavaScript handler of `action` and returns its decoded result and dialog.
+  public func invoke(action: String, payload: [String: Any], timeoutMs: Int) async throws -> AgentActionsReply {
     let data = try JSONSerialization.data(withJSONObject: payload)
     let payloadJson = String(decoding: data, as: UTF8.self)
     let resultJson = try await dispatch(action: action, payloadJson: payloadJson, timeoutMs: timeoutMs)
-    return try JSONSerialization.jsonObject(with: Data(resultJson.utf8), options: [.fragmentsAllowed])
+    guard let envelope = try JSONSerialization.jsonObject(with: Data(resultJson.utf8)) as? [String: Any] else {
+      throw AgentActionsError.invalidResult(action: action, expected: "a reply from registerAgentActions")
+    }
+    return AgentActionsReply(value: envelope["value"] ?? NSNull(), dialog: envelope["dialog"] as? String)
   }
 
   public func dispatch(action: String, payloadJson: String, timeoutMs: Int) async throws -> String {
@@ -114,6 +117,12 @@ public final class AgentActionsDispatcher: @unchecked Sendable {
     Self.log.info("finish id=\(requestId, privacy: .public) success=\((try? result.get()) != nil)")
     continuation.resume(with: result)
   }
+}
+
+/// What a JavaScript handler returned: the decoded value and, if the handler used `reply()`, what Siri should say.
+public struct AgentActionsReply {
+  public let value: Any
+  public let dialog: String?
 }
 
 /// Converts decoded JSON results to the types App Intents can return.

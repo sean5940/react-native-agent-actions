@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { generateKotlin } from '../generators/kotlin.mjs';
-import { generateSwift } from '../generators/swift.mjs';
+import { generateShortcutStrings, generateSwift } from '../generators/swift.mjs';
 import { generateTypeScript } from '../generators/typescript.mjs';
 import { readSchema } from '../schema.mjs';
 
@@ -56,6 +56,10 @@ describe('generateKotlin', () => {
     assert.match(kotlin, /rating = if \(json\.isNull\("rating"\)\) null else json\.getLong\("rating"\)/);
   });
 
+  it('reads the value out of the reply envelope', () => {
+    assert.match(kotlin, /return JSONObject\(text\)\.opt\("value"\)/);
+  });
+
   it('sends params and keeps the configured timeout', () => {
     assert.match(kotlin, /if \(limit != null\) payload\.put\("limit", limit\)/);
     assert.match(kotlin, /payload\.put\("tags", JSONArray\(tags\)\)/);
@@ -80,10 +84,30 @@ describe('generateSwift', () => {
     assert.match(swift, /if let limit \{ payload\["limit"\] = limit \}/);
   });
 
-  it('returns objects as JSON, primitives as typed values and strings with a dialog', () => {
-    assert.match(swift, /ReturnsValue<String> \{\n[\s\S]*?AgentActionsResult\.json\(result, action: "searchNotes"\)/);
-    assert.match(swift, /ReturnsValue<Int>/);
-    assert.match(swift, /ReturnsValue<String> & ProvidesDialog/);
+  it('returns objects as JSON and primitives as typed values', () => {
+    assert.match(swift, /ReturnsValue<String> & ProvidesDialog \{\n[\s\S]*?AgentActionsResult\.json\(reply\.value, action: "searchNotes"\)/);
+    assert.match(swift, /ReturnsValue<Int> & ProvidesDialog/);
+  });
+
+  it('lets the handler choose the dialog and falls back to the string result', () => {
+    assert.match(swift, /AgentActionsResult\.string\(reply\.value, action: "sayHello"\)\n {4}return \.result\(value: value, dialog: "\\\(reply\.dialog \?\? value\)"\)/);
+    assert.match(swift, /AgentActionsResult\.int\(reply\.value, action: "countNotes"\)\n {4}return \.result\(value: value, dialog: "\\\(reply\.dialog \?\? ""\)"\)/);
+  });
+
+  it('writes one AppShortcuts.strings per locale, keyed by the base phrase', () => {
+    const localized = readSchema({
+      actions: {
+        countNotes: {
+          title: 'Count notes',
+          description: 'Counts.',
+          ios: { phrases: ['Count "notes" in ${applicationName}'], localizedPhrases: { ko: ['${applicationName}에서 노트 세기'] } },
+        },
+      },
+    });
+    const files = generateShortcutStrings(localized);
+    assert.deepEqual([...files.keys()], ['ko']);
+    assert.match(files.get('ko') ?? '', /"Count \\"notes\\" in \$\{applicationName\}" = "\$\{applicationName\}에서 노트 세기";/);
+    assert.equal(generateShortcutStrings(schema).size, 0);
   });
 
   it('caps the timeout below the 30 second App Intents limit', () => {
@@ -103,8 +127,9 @@ describe('generateTypeScript', () => {
     assert.match(ts, /export interface Note \{/);
     assert.match(ts, /rating\?: number \| null;/);
     assert.match(ts, /export interface SearchNotesParams \{[\s\S]*?limit\?: number;[\s\S]*?tags: string\[\];/);
-    assert.match(ts, /searchNotes\(params: SearchNotesParams\): Note\[\] \| Promise<Note\[\]>;/);
-    assert.match(ts, /countNotes\(params: Record<string, never>\): number \| Promise<number>;/);
-    assert.match(ts, /clearNotes\(params: Record<string, never>\): void \| Promise<void>;/);
+    assert.match(ts, /import type \{ AgentActionResult \} from 'react-native-agent-actions';/);
+    assert.match(ts, /searchNotes\(params: SearchNotesParams\): AgentActionResult<Note\[\]>;/);
+    assert.match(ts, /countNotes\(params: Record<string, never>\): AgentActionResult<number>;/);
+    assert.match(ts, /clearNotes\(params: Record<string, never>\): AgentActionResult<void>;/);
   });
 });
