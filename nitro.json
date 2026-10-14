@@ -1,0 +1,23 @@
+{
+  "cxxNamespace": ["agentactions"],
+  "ios": {
+    "iosModuleName": "AgentActions"
+  },
+  "android": {
+    "androidNamespace": ["agentactions"],
+    "androidCxxLibName": "agentactions"
+  },
+  "autolinking": {
+    "AgentActions": {
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "AgentActions"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "AgentActions"
+      }
+    }
+  },
+  "ignorePaths": ["node_modules"]
+}
