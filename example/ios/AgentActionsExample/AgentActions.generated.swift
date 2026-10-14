@@ -43,6 +43,19 @@ struct SearchNotesAgentIntent: AppIntent {
 }
 
 @available(iOS 16.0, *)
+struct SummarizeNotesAgentIntent: AppIntent {
+  static let title: LocalizedStringResource = "Summarize notes"
+  static let description = IntentDescription("Returns a one-sentence summary of the saved notes: how many there are, which are pinned and which tags they use.")
+
+  func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
+    let payload: [String: Any] = [:]
+    let result = try await AgentActionsDispatcher.shared.invoke(action: "summarizeNotes", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.string(result, action: "summarizeNotes")
+    return .result(value: value, dialog: "\(value)")
+  }
+}
+
+@available(iOS 16.0, *)
 struct GetStatsAgentIntent: AppIntent {
   static let title: LocalizedStringResource = "Get app stats"
   static let description = IntentDescription("Reports how many notes exist and how long the JavaScript runtime has been running.")
@@ -115,6 +128,12 @@ struct AgentActionsShortcuts: AppShortcutsProvider {
       phrases: ["Search notes in \(.applicationName)"],
       shortTitle: "Search notes",
       systemImageName: "magnifyingglass"
+    )
+    AppShortcut(
+      intent: SummarizeNotesAgentIntent(),
+      phrases: ["Summarize notes in \(.applicationName)"],
+      shortTitle: "Summarize notes",
+      systemImageName: "text.alignleft"
     )
     AppShortcut(
       intent: GetStatsAgentIntent(),

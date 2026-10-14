@@ -73,6 +73,18 @@ public abstract class AgentActionsServiceBase : AppFunctionService() {
     return agentActionsDecode("searchNotes") { (result as JSONArray).let { array -> List(array.length()) { i -> readNote(array.getJSONObject(i)) } } }
   }
 
+  /**
+   * Returns a one-sentence summary of the saved notes: how many there are, which are pinned and which tags they use.
+   *
+   * @return The summary.
+   */
+  @AppFunctionDeclaration(isDescribedByKDoc = true)
+  public suspend fun summarizeNotes(): String {
+    val payload = JSONObject()
+    val result = agentActionsCall("summarizeNotes", payload, 10000L)
+    return agentActionsDecode("summarizeNotes") { result as String }
+  }
+
   /** Reports how many notes exist and how long the JavaScript runtime has been running. */
   @AppFunctionDeclaration(isDescribedByKDoc = true)
   public suspend fun getStats(): Stats {

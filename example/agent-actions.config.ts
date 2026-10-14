@@ -57,6 +57,16 @@ export default {
         systemImageName: 'magnifyingglass',
       },
     },
+    summarizeNotes: {
+      title: 'Summarize notes',
+      description:
+        'Returns a one-sentence summary of the saved notes: how many there are, which are pinned and which tags they use.',
+      result: { type: 'string', description: 'The summary.' },
+      ios: {
+        phrases: ['Summarize notes in ${applicationName}'],
+        systemImageName: 'text.alignleft',
+      },
+    },
     getStats: {
       title: 'Get app stats',
       description:

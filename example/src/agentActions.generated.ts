@@ -50,6 +50,8 @@ export interface AgentActionHandlers {
   echo(params: EchoParams): string | Promise<string>;
   /** Finds notes whose title or tags contain the query. */
   searchNotes(params: SearchNotesParams): Note[] | Promise<Note[]>;
+  /** Returns a one-sentence summary of the saved notes: how many there are, which are pinned and which tags they use. */
+  summarizeNotes(params: Record<string, never>): string | Promise<string>;
   /** Reports how many notes exist and how long the JavaScript runtime has been running. */
   getStats(params: Record<string, never>): Stats | Promise<Stats>;
   /** Archives the note with the given id. */
