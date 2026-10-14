@@ -1,5 +1,5 @@
 PODS:
-  - AgentActions (0.1.0):
+  - AgentActions (0.2.0):
     - AgentActionsCore
     - hermes-engine
     - NitroModules
@@ -24,7 +24,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - AgentActionsCore (0.1.0)
+  - AgentActionsCore (0.2.0)
   - boost (1.84.0):
     - ReactNativeDependencies
   - DoubleConversion (1.1.6):
@@ -1929,8 +1929,8 @@ EXTERNAL SOURCES:
     :path: build/rncore-facades/Yoga
 
 SPEC CHECKSUMS:
-  AgentActions: c611271372705152f3663c8831b073bed08fd453
-  AgentActionsCore: 5af8feed3b54351daeafcaf392c5aae2e8c870bb
+  AgentActions: b90d87d805b43a9c558ce95235831b795d08169b
+  AgentActionsCore: b9d28e11a002c51f8fd6fa1ce918569544837540
   boost: 8502bfdc46e2804408af2e163049ece181009af4
   DoubleConversion: 501a575c40c0b50c89685762dd3e415e6bb26fb0
   fast_float: 7c925d1cebf8328d4018d061f49377e9f887e3b4

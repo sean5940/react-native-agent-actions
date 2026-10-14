@@ -1,6 +1,6 @@
 {
   "name": "react-native-agent-actions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Expose React Native app actions to on-device AI agents through Android AppFunctions and iOS App Intents, declared once in TypeScript.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
