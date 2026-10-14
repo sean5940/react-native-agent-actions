@@ -104,9 +104,10 @@ Run it again whenever you change the config. It writes:
 |---|---|
 | `android/app/src/main/java/dev/agentactions/generated/AgentActions.generated.kt` | AppFunctions entry point service with one function per action |
 | `ios/<App>/AgentActions.generated.swift` | One App Intent per action, plus App Shortcuts for actions with `phrases` |
+| `ios/<App>/<locale>.lproj/AppShortcuts.strings` | Phrases in other languages, one file per locale in `localizedPhrases` |
 | `src/agentActions.generated.ts` | Types for your handlers |
 
-The first run also wires the generated code into your project: it adds the service to `AndroidManifest.xml`, the KSP Gradle plugin to `android/build.gradle`, `apply from: .../agent-actions.gradle` to `android/app/build.gradle`, the Swift file to the Xcode target, and the `AgentActionsCore` pod to the Podfile. Commit the generated files.
+The first run also wires the generated code into your project: it adds the service to `AndroidManifest.xml`, the KSP Gradle plugin to `android/build.gradle`, `apply from: .../agent-actions.gradle` to `android/app/build.gradle`, the Swift file to the Xcode target, and the `AgentActionsCore` pod to the Podfile. Later runs keep the localized phrase files in the Xcode target and the Siri app names in `Info.plist` in sync with the config. Commit the generated files.
 
 Use `npx react-native-agent-actions generate --check` in CI to fail when the generated files are out of date.
 
@@ -140,6 +141,60 @@ export const handlers: AgentActionHandlers = {
 
 Typing the object as `AgentActionHandlers` makes TypeScript require a handler for every action and check the parameters and results. If a handler throws or rejects, the agent receives the error message.
 
+A handler can also return `reply(value, { dialog })` to give Siri a sentence to say. See [Siri](#siri).
+
+## Siri
+
+Actions with `ios.phrases` become App Shortcuts, so people can run them by talking to Siri without setting anything up. Three options decide whether that works well outside your own language and device.
+
+**Phrases in other languages.** Siri only matches phrases in its own language. Add `localizedPhrases` with one phrase per entry in `phrases`, in the same order:
+
+```ts
+ios: {
+  phrases: ['Search notes in ${applicationName}'],
+  localizedPhrases: {
+    de: ['Notizen in ${applicationName} suchen'],
+    es: ['Buscar notas en ${applicationName}'],
+  },
+},
+```
+
+The generator writes `<locale>.lproj/AppShortcuts.strings` for each locale and adds the files to the Xcode target.
+
+**Names people can say.** Siri finds the app by its display name. When the name is hard to say, or written in a different script from Siri's language, add the names people would actually use:
+
+```ts
+export default {
+  actions: { /* ... */ },
+  ios: {
+    appNames: ['Notes Pro', { name: 'NP', pronunciationHint: 'en pee' }],
+  },
+} satisfies AgentActionsConfig;
+```
+
+The generator writes them to `INAlternativeAppNames` in `Info.plist`, and Siri accepts them wherever a phrase says `${applicationName}`.
+
+**What Siri says.** When a handler returns a string, Siri shows and speaks it. For any other result, return `reply()`. The caller still receives `value`, and Siri says `dialog`:
+
+```ts
+import { reply } from 'react-native-agent-actions';
+
+export const handlers: AgentActionHandlers = {
+  getStats: async () => {
+    const stats = await loadStats();
+    return reply(stats, { dialog: `You have ${stats.noteCount} notes.` });
+  },
+};
+```
+
+Siri says the dialog exactly as written, so choose its language in the handler, for example from the device locale. Android ignores the dialog.
+
+Things to know when you test on a device:
+
+- The first time someone uses one of the app's phrases, Siri asks whether to turn on the app's shortcuts.
+- Avoid words that also name a built-in app. On a Korean device, "메모" (memo) made Siri offer Apple Notes, so the example app says "노트" instead.
+- Siri on the Simulator cannot match App Shortcut phrases and answers that the app is not on the device.
+
 ## Schema
 
 **Parameters** can be `string`, `number`, `integer`, `boolean`, or `array` of `string`. Mark them `optional: true` when the agent may leave them out.
@@ -162,8 +217,19 @@ Other options per action:
 |---|---|---|
 | `timeoutMs` | `10000` | How long the native side waits for your handler. iOS caps it at 25000 because the system stops App Intents after 30 seconds. |
 | `platforms` | `['android', 'ios']` | Limit an action to one platform. |
-| `ios.phrases` | none | App Shortcut phrases for Siri and Spotlight. Each must contain `${applicationName}`. At most 10 actions can have phrases. |
+| `ios.phrases` | none | App Shortcut phrases for Siri and Spotlight, in the app's development language. Each must contain `${applicationName}`. At most 10 actions can have phrases. |
+| `ios.localizedPhrases` | none | The same phrases in other languages, keyed by locale (`ko`, `ja`, `pt-BR`). Each list has one phrase per entry in `phrases`, in the same order. |
 | `ios.systemImageName` | `sparkles` | SF Symbol for the App Shortcut. |
+
+Options for the whole app, next to `actions`:
+
+| Option | Default | Meaning |
+|---|---|---|
+| `ios.appNames` | none | Other names Siri accepts for the app, written to `INAlternativeAppNames`. Strings, or `{ name, pronunciationHint }`. |
+| `ios.infoPlist` | `Info.plist` in the app folder | Where to write `appNames`. |
+| `ios.sourceDir`, `ios.xcodeproj`, `ios.target`, `ios.podfile` | found in `ios/` | Set them when the app has more than one Xcode project or target. |
+| `android.sourceDir`, `android.manifestPath` | `android/app/src/main/...` | Where the Kotlin file and the manifest are. |
+| `typescript.outputFile` | `src/agentActions.generated.ts` | Where the handler types are written. |
 
 ## How calls reach JavaScript
 
@@ -176,7 +242,7 @@ Measured on an emulator and a simulator with release builds, a call to an app th
 
 ## Testing
 
-**iOS:** actions with `phrases` show up in the Shortcuts app under your app's name, and every action also appears as an action you can add to a shortcut. Running them from the Shortcuts app works on the Simulator. Test Siri phrases on a real device: Siri on the Simulator cannot match App Shortcut phrases to your app, so it answers that the app is not on the device.
+**iOS:** actions with `phrases` show up in the Shortcuts app under your app's name, and every action also appears as an action you can add to a shortcut. Running them from the Shortcuts app works on the Simulator. Test Siri phrases on a real device, as described in [Siri](#siri).
 
 **Android:** on an Android 16 or later device or emulator, list the indexed functions and call one with `adb`. Function ids have the form `dev.agentactions.generated.AgentActionsServiceBase#<action>`.
 
