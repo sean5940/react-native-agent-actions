@@ -23,5 +23,21 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <!-- react-native-agent-actions:start -->
+      <service
+        android:name="dev.agentactions.generated.AgentActionsService"
+        android:permission="android.permission.BIND_APP_FUNCTION_SERVICE"
+        android:exported="true">
+        <property
+          android:name="android.app.appfunctions.schema"
+          android:value="app_functions_schema.xsd" />
+        <property
+          android:name="android.app.appfunctions.v2"
+          android:value="agent_actions.xml" />
+        <intent-filter>
+          <action android:name="android.app.appfunctions.AppFunctionService" />
+        </intent-filter>
+      </service>
+      <!-- react-native-agent-actions:end -->
     </application>
 </manifest>

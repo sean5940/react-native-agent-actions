@@ -17,8 +17,7 @@ end
 target 'AgentActionsExample' do
   config = use_native_modules!
 
-  # The Nitro module depends on this pure Swift pod. Autolinking only picks up one podspec per package.
-  pod 'AgentActionsCore', :path => '../..'
+  pod 'AgentActionsCore', :path => '../../ios/core' # react-native-agent-actions
 
   use_react_native!(
     :path => config[:reactNativePath],
