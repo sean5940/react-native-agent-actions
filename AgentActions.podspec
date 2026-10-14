@@ -18,7 +18,9 @@ Pod::Spec.new do |s|
     "ios/**/*.{m,mm}",
     "cpp/**/*.{hpp,cpp}",
   ]
+  s.exclude_files = "ios/core/**/*"
 
+  s.dependency 'AgentActionsCore'
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
 
