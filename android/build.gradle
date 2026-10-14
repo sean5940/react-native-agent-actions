@@ -40,6 +40,12 @@ apply from: '../nitrogen/generated/android/agentactions+autolinking.gradle'
 
 apply plugin: "com.facebook.react"
 
+// This module has no TurboModule specs. Without this, codegen scans the repository root, which in this
+// repository includes node_modules/react-native, and compiles React Native's own specs into the library.
+react {
+  jsRootDir = file("../src/")
+}
+
 android {
   namespace "com.margelo.nitro.agentactions"
 
