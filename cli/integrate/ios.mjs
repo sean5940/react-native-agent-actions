@@ -140,36 +140,40 @@ export function syncShortcutStrings(xcodeproj, target, sourceDir, locales) {
   return result.stdout.trim() === 'unchanged' ? 'unchanged' : 'updated';
 }
 
+/** @param {string} text */
+function escapeXml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 /**
- * `INAlternativeAppNames` entries for the Info.plist.
+ * Sets `INAlternativeAppNames` in an XML Info.plist. Edits the text instead of calling plutil,
+ * so `generate --check` also works on Linux CI.
+ * @param {string} plist
  * @param {import('../schema.mjs').AppName[]} appNames
+ * @returns {string | undefined} The updated plist, or undefined when it is not an XML plist.
  */
-export function alternativeAppNames(appNames) {
-  return appNames.map((entry) =>
-    entry.pronunciationHint
-      ? { INAlternativeAppName: entry.name, INAlternativeAppNamePronunciationHint: entry.pronunciationHint }
-      : { INAlternativeAppName: entry.name }
-  );
-}
-
-/**
- * @param {string} plist
- * @returns {unknown} The current `INAlternativeAppNames`, or undefined when the key is missing.
- */
-export function readAlternativeAppNames(plist) {
-  const result = spawnSync('plutil', ['-extract', 'INAlternativeAppNames', 'json', '-o', '-', plist], { encoding: 'utf8' });
-  return result.status === 0 ? JSON.parse(result.stdout) : undefined;
-}
-
-/**
- * @param {string} plist
- * @param {unknown} names
- */
-export function writeAlternativeAppNames(plist, names) {
-  const result = spawnSync('plutil', ['-replace', 'INAlternativeAppNames', '-json', JSON.stringify(names), plist], { encoding: 'utf8' });
-  if (result.status !== 0) {
-    throw new Error(`Could not write INAlternativeAppNames to ${plist}: ${(result.stderr || '').trim()}`);
+export function updateInfoPlist(plist, appNames) {
+  const end = plist.lastIndexOf('</dict>');
+  if (!plist.includes('<plist') || end === -1) {
+    return undefined;
   }
+  const indent = /^([ \t]+)<key>/m.exec(plist)?.[1] ?? '\t';
+  const entry = indent.repeat(3);
+  const lines = [`${indent}<key>INAlternativeAppNames</key>`, `${indent}<array>`];
+  for (const { name, pronunciationHint } of appNames) {
+    lines.push(`${indent.repeat(2)}<dict>`, `${entry}<key>INAlternativeAppName</key>`, `${entry}<string>${escapeXml(name)}</string>`);
+    if (pronunciationHint) {
+      lines.push(`${entry}<key>INAlternativeAppNamePronunciationHint</key>`, `${entry}<string>${escapeXml(pronunciationHint)}</string>`);
+    }
+    lines.push(`${indent.repeat(2)}</dict>`);
+  }
+  lines.push(`${indent}</array>`);
+  const block = `${lines.join('\n')}\n`;
+  const existing = /^[ \t]*<key>INAlternativeAppNames<\/key>\s*(?:<array\/>|<array>[\s\S]*?<\/array>)[ \t]*\n?/m;
+  if (existing.test(plist)) {
+    return plist.replace(existing, () => block);
+  }
+  return `${plist.slice(0, end)}${block}${plist.slice(end)}`;
 }
 
 /**

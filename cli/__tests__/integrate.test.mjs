@@ -1,14 +1,45 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { updateAppBuildGradle, updateManifest, updateRootBuildGradle } from '../integrate/android.mjs';
-import { alternativeAppNames, updatePodfile } from '../integrate/ios.mjs';
+import { updateInfoPlist, updatePodfile } from '../integrate/ios.mjs';
 
-describe('alternativeAppNames', () => {
-  it('writes the pronunciation hint only when there is one', () => {
-    assert.deepEqual(alternativeAppNames([{ name: '노트 앱', pronunciationHint: undefined }, { name: 'Notey', pronunciationHint: 'no tee' }]), [
-      { INAlternativeAppName: '노트 앱' },
-      { INAlternativeAppName: 'Notey', INAlternativeAppNamePronunciationHint: 'no tee' },
-    ]);
+const plist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+\t<key>CFBundleName</key>
+\t<string>Notey</string>
+</dict>
+</plist>
+`;
+
+describe('updateInfoPlist', () => {
+  const names = [
+    { name: '노트 앱', pronunciationHint: undefined },
+    { name: 'Notes & More', pronunciationHint: 'notes and more' },
+  ];
+
+  it('adds the names with a pronunciation hint only when there is one', () => {
+    const updated = updateInfoPlist(plist, names) ?? '';
+    assert.ok(updated.endsWith(
+      '\t<key>INAlternativeAppNames</key>\n\t<array>\n' +
+        '\t\t<dict>\n\t\t\t<key>INAlternativeAppName</key>\n\t\t\t<string>노트 앱</string>\n\t\t</dict>\n' +
+        '\t\t<dict>\n\t\t\t<key>INAlternativeAppName</key>\n\t\t\t<string>Notes &amp; More</string>\n' +
+        '\t\t\t<key>INAlternativeAppNamePronunciationHint</key>\n\t\t\t<string>notes and more</string>\n\t\t</dict>\n' +
+        '\t</array>\n</dict>\n</plist>\n'
+    ));
+    assert.equal(updateInfoPlist(updated, names), updated);
+  });
+
+  it('replaces the names already in the plist where they are', () => {
+    const before = plist.replace('</dict>', '\t<key>INAlternativeAppNames</key>\n\t<array/>\n\t<key>UIStatusBarHidden</key>\n\t<true/>\n</dict>');
+    const updated = updateInfoPlist(before, [names[0]]) ?? '';
+    assert.match(updated, /<string>노트 앱<\/string>\n\t\t<\/dict>\n\t<\/array>\n\t<key>UIStatusBarHidden<\/key>/);
+    assert.equal(updated.match(/INAlternativeAppNames/g)?.length, 1);
+  });
+
+  it('leaves binary plists alone', () => {
+    assert.equal(updateInfoPlist('bplist00\u0000', names), undefined);
   });
 });
 

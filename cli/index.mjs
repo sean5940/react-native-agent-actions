@@ -8,15 +8,7 @@ import { generateKotlin } from './generators/kotlin.mjs';
 import { generateShortcutStrings, generateSwift, SHORTCUTS_STRINGS_FILE, STRINGS_HEADER, SWIFT_FILE } from './generators/swift.mjs';
 import { generateTypeScript } from './generators/typescript.mjs';
 import { kotlinPath, readIfExists, updateAppBuildGradle, updateManifest, updateRootBuildGradle } from './integrate/android.mjs';
-import {
-  addFileToXcodeProject,
-  alternativeAppNames,
-  findXcodeproj,
-  readAlternativeAppNames,
-  syncShortcutStrings,
-  updatePodfile,
-  writeAlternativeAppNames,
-} from './integrate/ios.mjs';
+import { addFileToXcodeProject, findXcodeproj, syncShortcutStrings, updateInfoPlist, updatePodfile } from './integrate/ios.mjs';
 import { IOS_MAX_TIMEOUT_MS, readSchema, SchemaError } from './schema.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -169,8 +161,8 @@ async function main() {
   }
   const shortcutStrings = generateShortcutStrings(schema);
   const infoPlist = iosSourceDir ? path.resolve(root, ios.infoPlist ?? path.join(iosSourceDir, 'Info.plist')) : undefined;
-  const appNames = schema.appNames.length > 0 ? alternativeAppNames(schema.appNames) : undefined;
-  let appNamesStale = false;
+  /** @type {string | undefined} */
+  let infoPlistTodo;
   if (hasIos && iosSourceDir) {
     outputs.push({ file: path.join(iosSourceDir, SWIFT_FILE), content: swift });
     for (const [locale, content] of shortcutStrings) {
@@ -184,16 +176,21 @@ async function main() {
         outputs.push({ file, content: undefined });
       }
     }
-    if (appNames && infoPlist && fs.existsSync(infoPlist)) {
-      appNamesStale = JSON.stringify(readAlternativeAppNames(infoPlist)) !== JSON.stringify(appNames);
+    if (schema.appNames.length > 0 && infoPlist) {
+      const plist = readIfExists(infoPlist);
+      const updated = plist === undefined ? undefined : updateInfoPlist(plist, schema.appNames);
+      if (updated !== undefined) {
+        outputs.push({ file: infoPlist, content: updated });
+      } else if (plist === undefined) {
+        infoPlistTodo = `Info.plist not found at ${relative(infoPlist)}. Set ios.infoPlist in the config to add the Siri app names.`;
+      } else {
+        infoPlistTodo = `${relative(infoPlist)} is not an XML plist. Add INAlternativeAppNames to it by hand.`;
+      }
     }
   }
 
   if (values.check) {
     const stale = staleOutputs(outputs);
-    if (appNamesStale && infoPlist) {
-      stale.push({ file: infoPlist, content: '' });
-    }
     if (stale.length > 0) {
       fail(`Generated files are out of date: ${stale.map((output) => relative(output.file)).join(', ')}. Run react-native-agent-actions generate.`);
     }
@@ -254,11 +251,8 @@ async function main() {
     } catch (error) {
       todo.push(/** @type {Error} */ (error).message);
     }
-    if (appNamesStale && appNames && infoPlist) {
-      writeAlternativeAppNames(infoPlist, appNames);
-      console.log(`updated  ${relative(infoPlist)} (INAlternativeAppNames)`);
-    } else if (appNames && infoPlist && !fs.existsSync(infoPlist)) {
-      todo.push(`Info.plist not found at ${relative(infoPlist)}. Set ios.infoPlist in the config to add the Siri app names.`);
+    if (infoPlistTodo) {
+      todo.push(infoPlistTodo);
     }
     const clamped = schema.actions.filter((action) => action.ios && action.timeoutMs > IOS_MAX_TIMEOUT_MS);
     if (clamped.length > 0) {
