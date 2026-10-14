@@ -33,6 +33,7 @@ export default {
       result: { type: 'string', description: 'The same text.' },
       ios: {
         phrases: ['Echo with ${applicationName}'],
+        localizedPhrases: { ko: ['${applicationName}로 에코'] },
         systemImageName: 'text.bubble',
       },
     },
@@ -54,6 +55,7 @@ export default {
       },
       ios: {
         phrases: ['Search notes in ${applicationName}'],
+        localizedPhrases: { ko: ['${applicationName}에서 노트 검색'] },
         systemImageName: 'magnifyingglass',
       },
     },
@@ -64,6 +66,7 @@ export default {
       result: { type: 'string', description: 'The summary.' },
       ios: {
         phrases: ['Summarize notes in ${applicationName}'],
+        localizedPhrases: { ko: ['${applicationName}에서 노트 요약해 줘'] },
         systemImageName: 'text.alignleft',
       },
     },
@@ -84,6 +87,7 @@ export default {
       },
       ios: {
         phrases: ['Get stats from ${applicationName}'],
+        localizedPhrases: { ko: ['${applicationName} 통계 알려 줘'] },
         systemImageName: 'chart.bar',
       },
     },
@@ -120,8 +124,14 @@ export default {
       result: { type: 'string' },
       ios: {
         phrases: ['Fail with ${applicationName}'],
+        localizedPhrases: { ko: ['${applicationName} 실패 테스트'] },
         systemImageName: 'xmark.octagon',
       },
     },
+  },
+  ios: {
+    // Siri finds the app by name. The display name "AgentActionsExample" is hard to say,
+    // so give Siri names that people can actually speak.
+    appNames: ['예제 앱', 'Example app'],
   },
 } satisfies AgentActionsConfig;

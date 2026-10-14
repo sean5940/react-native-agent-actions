@@ -13,7 +13,6 @@ import dev.agentactions.AgentActionsDispatcher
 import kotlin.coroutines.cancellation.CancellationException
 import org.json.JSONArray
 import org.json.JSONObject
-import org.json.JSONTokener
 
 /** A note saved in the app. */
 @AppFunctionSerializable(isDescribedByKDoc = true)
@@ -136,7 +135,8 @@ public abstract class AgentActionsServiceBase : AppFunctionService() {
       } catch (error: Exception) {
         throw AppFunctionAppUnknownException(error.message)
       }
-    return JSONTokener(text).nextValue()
+    // registerAgentActions sends { value, dialog }. The dialog is for Siri, so Android only reads the value.
+    return JSONObject(text).opt("value")
   }
 }
 

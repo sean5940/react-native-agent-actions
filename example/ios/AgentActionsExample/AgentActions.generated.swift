@@ -15,9 +15,9 @@ struct EchoAgentIntent: AppIntent {
   func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
     var payload: [String: Any] = [:]
     payload["text"] = text
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "echo", payload: payload, timeoutMs: 10000)
-    let value = try AgentActionsResult.string(result, action: "echo")
-    return .result(value: value, dialog: "\(value)")
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "echo", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.string(reply.value, action: "echo")
+    return .result(value: value, dialog: "\(reply.dialog ?? value)")
   }
 }
 
@@ -32,13 +32,13 @@ struct SearchNotesAgentIntent: AppIntent {
   @Parameter(title: "Limit", description: "Maximum number of notes to return. Defaults to 5.")
   var limit: Int?
 
-  func perform() async throws -> some IntentResult & ReturnsValue<String> {
+  func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
     var payload: [String: Any] = [:]
     payload["query"] = query
     if let limit { payload["limit"] = limit }
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "searchNotes", payload: payload, timeoutMs: 10000)
-    let value = try AgentActionsResult.json(result, action: "searchNotes")
-    return .result(value: value)
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "searchNotes", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.json(reply.value, action: "searchNotes")
+    return .result(value: value, dialog: "\(reply.dialog ?? "")")
   }
 }
 
@@ -49,9 +49,9 @@ struct SummarizeNotesAgentIntent: AppIntent {
 
   func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
     let payload: [String: Any] = [:]
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "summarizeNotes", payload: payload, timeoutMs: 10000)
-    let value = try AgentActionsResult.string(result, action: "summarizeNotes")
-    return .result(value: value, dialog: "\(value)")
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "summarizeNotes", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.string(reply.value, action: "summarizeNotes")
+    return .result(value: value, dialog: "\(reply.dialog ?? value)")
   }
 }
 
@@ -60,11 +60,11 @@ struct GetStatsAgentIntent: AppIntent {
   static let title: LocalizedStringResource = "Get app stats"
   static let description = IntentDescription("Reports how many notes exist and how long the JavaScript runtime has been running.")
 
-  func perform() async throws -> some IntentResult & ReturnsValue<String> {
+  func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
     let payload: [String: Any] = [:]
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "getStats", payload: payload, timeoutMs: 10000)
-    let value = try AgentActionsResult.json(result, action: "getStats")
-    return .result(value: value)
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "getStats", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.json(reply.value, action: "getStats")
+    return .result(value: value, dialog: "\(reply.dialog ?? "")")
   }
 }
 
@@ -76,11 +76,11 @@ struct ArchiveNoteAgentIntent: AppIntent {
   @Parameter(title: "Id", description: "Identifier of the note to archive.")
   var id: String
 
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog {
     var payload: [String: Any] = [:]
     payload["id"] = id
-    _ = try await AgentActionsDispatcher.shared.invoke(action: "archiveNote", payload: payload, timeoutMs: 10000)
-    return .result()
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "archiveNote", payload: payload, timeoutMs: 10000)
+    return .result(dialog: "\(reply.dialog ?? "")")
   }
 }
 
@@ -92,12 +92,12 @@ struct WaitForAgentIntent: AppIntent {
   @Parameter(title: "Milliseconds", description: "How long to wait, in milliseconds.")
   var ms: Int
 
-  func perform() async throws -> some IntentResult & ReturnsValue<Int> {
+  func perform() async throws -> some IntentResult & ReturnsValue<Int> & ProvidesDialog {
     var payload: [String: Any] = [:]
     payload["ms"] = ms
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "waitFor", payload: payload, timeoutMs: 25000)
-    let value = try AgentActionsResult.int(result, action: "waitFor")
-    return .result(value: value)
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "waitFor", payload: payload, timeoutMs: 25000)
+    let value = try AgentActionsResult.int(reply.value, action: "waitFor")
+    return .result(value: value, dialog: "\(reply.dialog ?? "")")
   }
 }
 
@@ -108,9 +108,9 @@ struct FailAgentIntent: AppIntent {
 
   func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
     let payload: [String: Any] = [:]
-    let result = try await AgentActionsDispatcher.shared.invoke(action: "fail", payload: payload, timeoutMs: 10000)
-    let value = try AgentActionsResult.string(result, action: "fail")
-    return .result(value: value, dialog: "\(value)")
+    let reply = try await AgentActionsDispatcher.shared.invoke(action: "fail", payload: payload, timeoutMs: 10000)
+    let value = try AgentActionsResult.string(reply.value, action: "fail")
+    return .result(value: value, dialog: "\(reply.dialog ?? value)")
   }
 }
 
