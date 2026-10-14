@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="690" viewBox="0 0 960 690" role="img" aria-label="How react-native-agent-actions turns one config into Android AppFunctions, iOS App Intents and TypeScript types, and routes calls to JavaScript handlers">
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8c959f"/></marker>
+    <marker id="tail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8c959f"/></marker>
+  </defs>
+  <rect x="0.75" y="0.75" width="958.5" height="688.5" rx="16" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <rect x="330" y="28" width="300" height="64" rx="10" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.5"/>
+  <text x="480" y="55.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="600" fill="#1f2328">agent-actions.config.ts</text>
+  <text x="480" y="74.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">actions · parameters · results</text>
+  <line x1="480" y1="92" x2="480" y2="128" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="492" y="116" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12.5" fill="#59636e">npx react-native-agent-actions generate</text>
+  <line x1="175" y1="136" x2="785" y2="136" stroke="#8c959f" stroke-width="1.6"/>
+  <line x1="175" y1="136" x2="175" y2="172" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <line x1="480" y1="136" x2="480" y2="172" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <line x1="785" y1="136" x2="785" y2="172" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="40" y="166" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#3fa45b">Android</text>
+  <text x="345" y="166" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#3b82f6">iOS</text>
+  <text x="650" y="166" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#8b5cf6">TypeScript</text>
+  <rect x="40" y="174" width="270" height="66" rx="10" fill="#e8f7ec" stroke="#3fa45b" stroke-width="1.5"/>
+  <text x="175" y="202.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="600" fill="#1f2328">AgentActions.generated.kt</text>
+  <text x="175" y="221.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">AppFunctions service</text>
+  <rect x="345" y="174" width="270" height="66" rx="10" fill="#e9f1fe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="480" y="202.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="600" fill="#1f2328">AgentActions.generated.swift</text>
+  <text x="480" y="221.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">App Intents</text>
+  <rect x="650" y="174" width="270" height="66" rx="10" fill="#f2ecfe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="785" y="202.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="600" fill="#1f2328">agentActions.generated.ts</text>
+  <text x="785" y="221.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">handler types</text>
+  <line x1="175" y1="240" x2="175" y2="290" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="187" y="270" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">build (KSP), OS indexes</text>
+  <line x1="480" y1="240" x2="480" y2="290" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="492" y="270" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">build (Xcode), OS indexes</text>
+  <rect x="40" y="292" width="270" height="66" rx="10" fill="#e8f7ec" stroke="#3fa45b" stroke-width="1.5"/>
+  <text x="175" y="320.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1f2328">Gemini and other agents</text>
+  <text x="175" y="339.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">call an app function</text>
+  <rect x="345" y="292" width="270" height="66" rx="10" fill="#e9f1fe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="480" y="320.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1f2328">Siri · Shortcuts · Spotlight</text>
+  <text x="480" y="339.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">run an App Intent</text>
+  <line x1="175" y1="358" x2="175" y2="404" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="187" y="386" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">call</text>
+  <line x1="480" y1="358" x2="480" y2="404" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)"/>
+  <text x="492" y="386" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">call</text>
+  <rect x="40" y="406" width="270" height="104" rx="10" fill="#e8f7ec" stroke="#3fa45b" stroke-width="1.5"/>
+  <text x="175" y="434.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1f2328">Android dispatcher</text>
+  <text x="175" y="453.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">queues calls until JS is ready</text>
+  <text x="175" y="472.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">starts React Native without an Activity</text>
+  <text x="175" y="491.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">runs each call as a Headless JS task</text>
+  <rect x="345" y="406" width="270" height="104" rx="10" fill="#e9f1fe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="480" y="434.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1f2328">iOS dispatcher</text>
+  <text x="480" y="453.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">iOS launches the app in the background</text>
+  <text x="480" y="472.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">queues calls until JS is ready</text>
+  <text x="480" y="491.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">calls JS through Nitro</text>
+  <line x1="175" y1="512" x2="175" y2="574" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)" marker-start="url(#tail)"/>
+  <line x1="480" y1="512" x2="480" y2="574" stroke="#8c959f" stroke-width="1.6" marker-end="url(#head)" marker-start="url(#tail)"/>
+  <text x="187" y="548" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">call ↓  result ↑</text>
+  <text x="492" y="548" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">call ↓  result ↑</text>
+  <line x1="785" y1="240" x2="785" y2="574" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#head)"/>
+  <text x="797" y="410" text-anchor="start" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e">types</text>
+  <rect x="40" y="576" width="880" height="76" rx="10" fill="#fff5db" stroke="#d29922" stroke-width="1.5"/>
+  <text x="480" y="600" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1f2328">Your JavaScript handlers</text>
+  <text x="480" y="619" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#59636e">registerAgentActions(handlers)</text>
+  <text x="480" y="638" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">run even when the app was not running</text>
+  </svg>

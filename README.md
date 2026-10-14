@@ -7,18 +7,23 @@ Let AI agents call into your React Native app. You declare actions once in TypeS
 - **Android [AppFunctions](https://developer.android.com/ai/appfunctions)**, which Gemini and other on-device agents use to call app functions, and
 - **iOS [App Intents](https://developer.apple.com/documentation/appintents)**, which Siri, Shortcuts and Spotlight use.
 
-```text
-agent-actions.config.ts           your actions, their parameters and results
-      │  npx react-native-agent-actions generate
-      ▼
-Kotlin AppFunctions service       Swift App Intents        TypeScript handler types
-      │  build (KSP)                    │  build (Xcode)
-      ▼                                 ▼
-the OS indexes the actions; an agent, Siri or Shortcuts calls one
-      │  runtime
-      ▼
-your JavaScript handler           (the app is started in the background if it is not running)
-```
+<picture>
+  <source srcset="docs/flow.svg" type="image/svg+xml">
+  <img src="docs/flow.png" width="960" alt="One config generates an Android AppFunctions service, iOS App Intents and TypeScript types. Agents, Siri and Shortcuts call the app, and a native dispatcher hands each call to your JavaScript handler, starting the app in the background when needed.">
+</picture>
+
+<table>
+  <tr>
+    <th>iOS: Shortcuts runs actions while the app is not running</th>
+    <th>Android: an agent calls actions while the app is not running</th>
+  </tr>
+  <tr>
+    <td><img src="docs/demo-ios.gif" width="360" alt="The Shortcuts app runs Summarize notes while the example app is not running and shows the summary from the JavaScript handler. Opening the app shows that both calls ran in the background."></td>
+    <td><img src="docs/demo-android.gif" width="360" alt="Three app function calls run while the example app is not running. Opening the app shows them in its call log, and two more calls arrive while it is open."></td>
+  </tr>
+</table>
+
+Recorded with the [example app](example) on an iOS simulator and an Android 17 emulator. On Android the calls come from `adb shell cmd app_function execute-app-function`, which goes through the same system API that agents use. MP4 versions: [iOS](docs/demo-ios.mp4), [Android](docs/demo-android.mp4).
 
 > [!WARNING]
 > **Early release.** Google's AppFunctions library is still alpha (`androidx.appfunctions` `1.0.0-alpha13`) and changes between versions, and calling app functions from Gemini is limited to an early access program. Expect breaking changes.

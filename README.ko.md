@@ -7,18 +7,23 @@ AI 에이전트가 React Native 앱의 기능을 호출하게 해 주는 라이�
 - **Android [AppFunctions](https://developer.android.com/ai/appfunctions)**: Gemini 같은 온디바이스 에이전트가 앱 함수를 호출하는 경로입니다.
 - **iOS [App Intents](https://developer.apple.com/documentation/appintents)**: Siri와 단축어, Spotlight가 쓰는 경로입니다.
 
-```text
-agent-actions.config.ts           액션과 파라미터, 결과 타입
-      │  npx react-native-agent-actions generate
-      ▼
-Kotlin AppFunctions 서비스         Swift App Intents        TypeScript 핸들러 타입
-      │  빌드 (KSP)                    │  빌드 (Xcode)
-      ▼                                 ▼
-OS가 액션을 색인하고 에이전트나 Siri, 단축어가 호출
-      │  런타임
-      ▼
-JavaScript 핸들러                 (앱이 꺼져 있으면 백그라운드로 실행됩니다)
-```
+<picture>
+  <source srcset="docs/flow.ko.svg" type="image/svg+xml">
+  <img src="docs/flow.ko.png" width="960" alt="설정 하나로 Android AppFunctions 서비스, iOS App Intents, TypeScript 타입을 만듭니다. 에이전트나 Siri, 단축어가 앱을 호출하면 네이티브 디스패처가 필요할 때 앱을 백그라운드로 띄우고 호출을 JavaScript 핸들러에 넘깁니다.">
+</picture>
+
+<table>
+  <tr>
+    <th>iOS: 앱이 꺼진 상태에서 단축어로 액션 실행</th>
+    <th>Android: 앱이 꺼진 상태에서 에이전트가 액션 호출</th>
+  </tr>
+  <tr>
+    <td><img src="docs/demo-ios.gif" width="360" alt="예제 앱이 꺼진 상태에서 단축어 앱이 Summarize notes를 실행하고 JavaScript 핸들러가 만든 요약을 보여 줍니다. 앱을 열면 두 호출이 백그라운드에서 처리된 기록이 보입니다."></td>
+    <td><img src="docs/demo-android.gif" width="360" alt="예제 앱이 꺼진 상태에서 앱 함수 호출 세 건이 처리됩니다. 앱을 열면 호출 기록에 남아 있고 앱이 열린 뒤 들어온 호출 두 건도 바로 나타납니다."></td>
+  </tr>
+</table>
+
+[예제 앱](example)을 iOS 시뮬레이터와 Android 17 에뮬레이터에서 녹화했습니다. Android 호출은 `adb shell cmd app_function execute-app-function`으로 보냈습니다. 에이전트가 쓰는 시스템 API와 같은 경로입니다. 영상 원본: [iOS MP4](docs/demo-ios.mp4), [Android MP4](docs/demo-android.mp4)
 
 > [!WARNING]
 > **초기 버전입니다.** Google의 AppFunctions 라이브러리는 아직 alpha(`androidx.appfunctions` `1.0.0-alpha13`)라 버전마다 API가 바뀝니다. Gemini에서 앱 함수를 호출하는 기능도 아직 사전 참여 프로그램으로만 열려 있습니다. 호환되지 않는 변경이 생길 수 있습니다.
